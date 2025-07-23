@@ -95,11 +95,25 @@ class GUI:
         #self.master.resizable(False, False)
         self.master.geometry("300x200")
         self.serveur = srv
-        self.label = tk.Label(master, text="Bienvenue dans Sock.Nox !")
+        #GUI organisation avec des frame
+        main_frame = tk.Frame(master)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        left_frame = tk.Frame(main_frame)
+        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        right_frame = tk.Frame(main_frame)
+        right_frame.pack(side=tk.RIGHT, fill=tk.Y)
+
+        #compteur d'utilisateur
+        self.counter = tk.IntVar(value=0)
+        self.counter_label = tk.Label(right_frame, textvariable=self.counter, fg="#ffffff", bg="#1e1e2f", font=("Segoe UI", 10, "bold"))
+        self.counter_label.pack(pady=(10, 0))
+        self.label = tk.Label(left_frame, text="Bienvenue dans Sock.Nox !")
         self.label.pack(pady=40)
-        self.button = tk.Button(master, text="Démarrer serveur", command=self.start)
+        self.button = tk.Button(left_frame, text="Démarrer serveur", command=self.start)
         self.button.pack(pady=10)
-        self.listbox = tk.Listbox(master, bg="#1e1e2f", fg="#ffffff", font=("Segoe UI", 10))
+        self.listbox = tk.Listbox(right_frame, bg="#1e1e2f", fg="#ffffff", font=("Segoe UI", 10))
         self.listbox.pack(pady=10, fill=tk.BOTH, expand=True)
 
     def start(self):
@@ -107,6 +121,8 @@ class GUI:
         threading.Thread(target=self.serveur.start, daemon=True).start()
     def add_connection(self, pseudo):
         self.listbox.insert(tk.END, f"{pseudo} connecté")
+        self.counter.set(self.counter.get() + 1)
+
        
 
 
