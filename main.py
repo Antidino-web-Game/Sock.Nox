@@ -8,8 +8,6 @@ users = Users()
 class Srv:
     def __init__(self):
         self.gui = ""
-    def add_connection(self, pseudo):
-        self.gui.listbox.insert(tk.END, f"{pseudo} connecté")
 
     def send_message(self, client_socket, message):
         try:
@@ -35,7 +33,7 @@ class Srv:
                 return
 
             users.add_user(pseudo, addr, client_socket)
-            self.gui.add_connection(pseudo)
+            self.gui.update_connection_list()
             print(f"Connexion de {addr} avec le pseudo {pseudo}")
 
             while True:
@@ -58,8 +56,18 @@ class Srv:
 
                 print(f"Reçu de {pseudo}({addr}): {message}")
                 self.notify_users(f"[{pseudo}] : {message}", exclude_pseudo=pseudo)
+        
+        except ConnectionResetError as e:
+            if e.errno == 10054:
+                print(f"Connexion perdue avec {pseudo}({addr}) : {e}")
+                users.remove_user(pseudo)
+                self.gui.update_connection_list()
+
+            else:
+                print(f"Erreur de connexion avec {pseudo}({addr}) : {e}")
         except Exception as e:
-            print(f"Erreur avec {pseudo}({addr}) : {e}")
+            print(f"Erreur inattendue avec {pseudo}({addr}) : {e}")
+
         finally:
             users.remove_user(pseudo)
             client_socket.close()
@@ -89,7 +97,8 @@ class Srv:
         finally:
             srv_socket.close()
 class GUI:
-    def __init__(self,master,srv):
+    def __init__(self,master,srv,users):
+        self.users=users
         self.master = master
         self.master.title("Sock.Nox serveur")
         #self.master.resizable(False, False)
@@ -122,13 +131,18 @@ class GUI:
     def add_connection(self, pseudo):
         self.listbox.insert(tk.END, f"{pseudo} connecté")
         self.counter.set(self.counter.get() + 1)
-
-       
+    def update_connection_list(self):
+        self.listbox.delete(0, tk.END)
+        pseudos = self.users.get_all_pseudos()
+        for pseudo in pseudos:
+            self.listbox.insert(tk.END, f"{pseudo} connecté")
+            self.counter.set(len(pseudos))
+        
 
 
 if __name__ == "__main__":
     serveur = Srv()
-    gui=GUI(tk.Tk(),serveur)
+    gui=GUI(tk.Tk(),serveur,users)
     serveur.gui=gui
     gui.master.mainloop()
     
