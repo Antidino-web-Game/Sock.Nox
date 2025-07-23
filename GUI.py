@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from client_connection import client
 import threading
+import time
 import socket
 class GUI:
     def __init__(self, master):
@@ -22,8 +23,8 @@ class GUI:
         if not self.pseudo:
             messagebox.showerror("Erreur", "Veuillez entrer un pseudo.")
             return
-        self.cl = client()
-        self.cl.__init__()
+        self.cl = client(self.pseudo)
+        time.sleep(5)
         self.message = f"Bienvenue {self.pseudo} !\nVous pouvez maintenant commencer à discuter."
         self.label.config(text=self.message)
         self.entry.delete(0, tk.END)

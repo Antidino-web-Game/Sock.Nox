@@ -17,9 +17,6 @@ class srv():
     def is_pseudo_taken(pseudo):
         return pseudo in users.get_all_pseudos()
 
-    def get_all_pseudos():
-        return users.get_all_pseudos()
-
     def notify_users(self,message, exclude_pseudo=None):
         """Envoie un message à tous les utilisateurs sauf éventuellement un."""
         for user_addr, user_info in users.users.items():
@@ -41,21 +38,20 @@ class srv():
                 data = client_socket.recv(1024)
                 if not data:
                     break
-
                 message = data.decode('utf-8')
                 if message.startswith('/'):
                     if message == '/pseudo':
                         self.send_message(client_socket, f"Les pseudos sont : {', '.join(users.get_all_pseudos())}")
                     continue
-
-                print(f"Reçu de {pseudo}({addr}): {message}")
-                self.notify_users(f"[{pseudo}] : {message}", exclude_pseudo=pseudo)
+                else:
+                    print(f"Reçu de {pseudo}({addr}): {message}")
+                    self.notify_users(f"[{pseudo}] : {message}", exclude_pseudo=pseudo)
         except Exception as e:
             print(f"Erreur avec {pseudo}({addr}) : {e}")
 
         print(f"Déconnexion de {pseudo}({addr})")
         users.remove_user(pseudo)
-        self.client_socket.close()
+        client_socket.close()
 
     def start(self,host='127.0.0.1', port=12345):
         """Démarre le serveur et accepte les connexions entrantes."""
