@@ -27,7 +27,7 @@ class GUI:
             messagebox.showerror("Erreur", "Veuillez entrer un pseudo.")
             return
         self.cl = client(self.pseudo)
-        time.sleep(2)
+        time.sleep(1.4)
         self.message = f"Bienvenue {self.pseudo} !\nVous pouvez maintenant commencer à discuter."
         self.label.config(text=self.message)
         self.entry.delete(0, tk.END)
