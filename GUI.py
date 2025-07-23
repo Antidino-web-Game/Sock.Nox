@@ -8,7 +8,7 @@ class GUI:
         self.master = master
         self.master.title("Sock.Nox client")
         self.message = "Bienvenue dans Sock.Nox !\nVeuillez saisir votre pseudo :"
-        self.pseudo = ""
+        self.pseudo = "null"
         self.label = tk.Label(master, text=self.message)
         self.label.pack(pady=40)
         self.button = tk.Button(master, text="Envoyer", command=self.send_pseudo)
@@ -19,23 +19,30 @@ class GUI:
 
     def send_pseudo(self):
         self.pseudo = self.entry.get()
+        if not self.pseudo:
+            messagebox.showerror("Erreur", "Veuillez entrer un pseudo.")
+            return
         self.cl = client()
-        self.cl.__init__(self.pseudo)
+        self.cl.__init__()
         self.message = f"Bienvenue {self.pseudo} !\nVous pouvez maintenant commencer à discuter."
         self.label.config(text=self.message)
         self.entry.delete(0, tk.END)
-        self.button.config(text="Envoyer Message", command=self.send_pseudo)
+        self.button.config(text="Envoyer Message", command=self.cl.send_message(self.entry.get()))
         self.entry.focus()
         thread_recv = threading.Thread(target=self.recevoir, daemon=True)
+        thread_debug = threading.Thread(target=self.debug, daemon=True)
+        thread_debug.start()
         thread_recv.start()
-        
+    def debug(self):
+        while True:
+            print(self.entry.get())    
     def update_message(self, new_message):
         self.message = new_message
         self.label.config(text=self.message)
     def recevoir(self):
         while True:
             try:
-                data = self.cl.recv(1024)
+                data = self.cl.cl.recv(1024)
                 if not data:
                     self.update_message("Déconnexion du serveur.")
                     print("Déconnexion du serveur.")
@@ -45,6 +52,7 @@ class GUI:
             except Exception as e:
                 print(f"\nErreur lors de la réception : {e}")
                 break
+            
     
          
 gui = GUI(master=tk.Tk())
