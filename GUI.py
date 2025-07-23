@@ -24,11 +24,12 @@ class GUI:
             messagebox.showerror("Erreur", "Veuillez entrer un pseudo.")
             return
         self.cl = client(self.pseudo)
-        time.sleep(5)
+        time.sleep(2)
         self.message = f"Bienvenue {self.pseudo} !\nVous pouvez maintenant commencer à discuter."
         self.label.config(text=self.message)
         self.entry.delete(0, tk.END)
-        self.button.config(text="Envoyer Message", command=self.cl.send_message(self.entry.get()))
+        self.button.config(text="Envoyer Message", command=self.send)
+        self.button.update()
         self.entry.focus()
         thread_recv = threading.Thread(target=self.recevoir, daemon=True)
         thread_debug = threading.Thread(target=self.debug, daemon=True)
@@ -53,7 +54,9 @@ class GUI:
             except Exception as e:
                 print(f"\nErreur lors de la réception : {e}")
                 break
-            
+    def send(self):
+        mesage = self.entry.get()
+        self.cl.send_message(mesage)
     
          
 gui = GUI(master=tk.Tk())
