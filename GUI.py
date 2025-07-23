@@ -3,11 +3,15 @@ from tkinter import messagebox
 from client_connection import client
 import threading
 import time
+from PIL import Image, ImageTk
 import socket
 class GUI:
     def __init__(self, master):
         self.master = master
         self.master.title("Sock.Nox client")
+        ico = Image.open('icon.png')
+        photo = ImageTk.PhotoImage(ico)
+        self.master.wm_iconphoto(False, photo)
         self.message = "Bienvenue dans Sock.Nox !\nVeuillez saisir votre pseudo :"
         self.pseudo = "null"
         self.label = tk.Label(master, text=self.message)
@@ -32,8 +36,6 @@ class GUI:
         self.button.update()
         self.entry.focus()
         thread_recv = threading.Thread(target=self.recevoir, daemon=True)
-        thread_debug = threading.Thread(target=self.debug, daemon=True)
-        thread_debug.start()
         thread_recv.start()
     def debug(self):
         while True:
@@ -49,7 +51,7 @@ class GUI:
                     self.update_message("Déconnexion du serveur.")
                     print("Déconnexion du serveur.")
                     break
-                    self.update_message(f"\n[Serveur] : {data.decode('utf-8')}")
+                self.update_message(f"\n[Serveur] : {data.decode('utf-8')}")
                 print("Entrez votre message (ou '/help' pour les commandes) : ",end="" ,flush=True)
             except Exception as e:
                 print(f"\nErreur lors de la réception : {e}")
