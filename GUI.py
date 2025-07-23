@@ -9,9 +9,8 @@ class GUI:
     def __init__(self, master):
         self.master = master
         self.master.title("Sock.Nox client")
-        ico = Image.open('icon.png')
-        photo = ImageTk.PhotoImage(ico)
-        self.master.wm_iconphoto(False, photo)
+        self.master.resizable(False, False)
+        self.master.geometry("300x200")
         self.message = "Bienvenue dans Sock.Nox !\nVeuillez saisir votre pseudo :"
         self.pseudo = "null"
         self.label = tk.Label(master, text=self.message)
