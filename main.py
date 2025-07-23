@@ -1,12 +1,15 @@
 import socket
 import threading
 from users import Users
+import tkinter as tk
 
 users = Users()
 
 class Srv:
     def __init__(self):
-        pass
+        self.gui = ""
+    def add_connection(self, pseudo):
+        self.gui.listbox.insert(tk.END, f"{pseudo} connecté")
 
     def send_message(self, client_socket, message):
         try:
@@ -32,6 +35,7 @@ class Srv:
                 return
 
             users.add_user(pseudo, addr, client_socket)
+            self.gui.add_connection(pseudo)
             print(f"Connexion de {addr} avec le pseudo {pseudo}")
 
             while True:
@@ -70,11 +74,11 @@ class Srv:
 
 
     def start(self, host='127.0.0.1', port=12345):
+
         srv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv_socket.bind((host, port))
         srv_socket.listen()
         print(f"Serveur en écoute sur {host}:{port}...")
-
         try:
             while True:
                 client_socket, addr = srv_socket.accept()
@@ -84,7 +88,31 @@ class Srv:
             print("Arrêt du serveur.")
         finally:
             srv_socket.close()
+class GUI:
+    def __init__(self,master,srv):
+        self.master = master
+        self.master.title("Sock.Nox serveur")
+        #self.master.resizable(False, False)
+        self.master.geometry("300x200")
+        self.serveur = srv
+        self.label = tk.Label(master, text="Bienvenue dans Sock.Nox !")
+        self.label.pack(pady=40)
+        self.button = tk.Button(master, text="Démarrer serveur", command=self.start)
+        self.button.pack(pady=10)
+        self.listbox = tk.Listbox(master, bg="#1e1e2f", fg="#ffffff", font=("Segoe UI", 10))
+        self.listbox.pack(pady=10, fill=tk.BOTH, expand=True)
+
+    def start(self):
+        self.label.config(text="le serveur a démaré\nSur écoute...")
+        threading.Thread(target=self.serveur.start, daemon=True).start()
+    def add_connection(self, pseudo):
+        self.listbox.insert(tk.END, f"{pseudo} connecté")
+       
+
 
 if __name__ == "__main__":
     serveur = Srv()
-    serveur.start()
+    gui=GUI(tk.Tk(),serveur)
+    serveur.gui=gui
+    gui.master.mainloop()
+    
