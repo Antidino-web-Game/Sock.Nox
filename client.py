@@ -1,6 +1,14 @@
 import socket
 import threading
 import os
+from GUI import GUI
+import tkinter as tk
+from client_connection import client
+
+# Initialisation de la fenêtre GUI
+gui = GUI(tk.Tk())
+# Démarrer la boucle principale de la GUI dans un thread séparé
+gui.master.after(0, gui.master.mainloop)
 
 commandes = {
     '/pseudo': "liste les pseudos",
@@ -10,24 +18,8 @@ commandes = {
     '/to' : "envoie un message privé à un utilisateur",
 }
 
-def recevoir():
-    while True:
-        try:
-            data = cl.recv(1024)
-            if not data:
-                print("\nConnexion fermée par le serveur.")
-                break
-            print(f"\n[Serveur] : {data.decode('utf-8')}")
-            print("Entrez votre message (ou '/help' pour les commandes) : ",end="" ,flush=True)
-        except Exception as e:
-            print(f"\nErreur lors de la réception : {e}")
-            break
 
-cl = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-cl.connect(('127.0.0.1', 12345))
-print("Connexion établie avec le serveur.")
-pseudo = input("Entrez votre pseudo : ")
-cl.sendall(pseudo.encode('utf-8'))
+
 
 # Démarrer le thread de réception
 thread_recv = threading.Thread(target=recevoir, daemon=True)
@@ -38,10 +30,10 @@ while True:
         message = input("Entrez votre message (ou 'exit' pour quitter) : ")
         if any(message.startswith(cmd) for cmd in commandes.keys()):
             if message.startswith('/pseudo'):
-                cl.sendall('/pseudo'.encode('utf-8'))
+                gui.cl.sendall('/pseudo'.encode('utf-8'))
             elif message.startswith('/exit'):
-                cl.sendall('/exit'.encode('utf-8'))
-                cl.close()
+                gui.cl.sendall('/exit'.encode('utf-8'))
+                gui.cl.close()
                 print("Déconnexion du serveur.")
                 exit()
             elif message.startswith('/help'):
@@ -53,8 +45,8 @@ while True:
             elif message.startswith('/to'):
                 message= input("Entrez le pseudo du destinataire : ")
                 message += " " + input("Entrez votre message privé : ")
-                cl.sendall(("#"+message).encode('utf-8'))    
+                gui.cl.sendall(("#"+message).encode('utf-8'))    
         else:
-            cl.sendall(message.encode('utf-8'))
+            gui.cl.sendall(message.encode('utf-8'))
     except Exception as e:
         print(f"Erreur lors de l'envoi du message : {e}")
