@@ -123,21 +123,20 @@ class GUI:
         self.button = tk.Button(left_frame, text="Démarrer serveur", command=self.start)
         self.button.pack(pady=10)
         self.listbox = tk.Listbox(right_frame, bg="#1e1e2f", fg="#ffffff", font=("Segoe UI", 10))
-        self.listbox.pack(pady=10, fill=tk.BOTH, expand=True)
+        self.listbox.pack(pady=5, fill=tk.BOTH, expand=True)
 
     def start(self):
         self.label.config(text="le serveur a démaré\nSur écoute...")
         threading.Thread(target=self.serveur.start, daemon=True).start()
-    def add_connection(self, pseudo):
-        self.listbox.insert(tk.END, f"{pseudo} connecté")
-        self.counter.set(self.counter.get() + 1)
     def update_connection_list(self):
         self.listbox.delete(0, tk.END)
         pseudos = self.users.get_all_pseudos()
-        for pseudo in pseudos:
-            self.listbox.insert(tk.END, f"{pseudo} connecté")
-            self.counter.set(len(pseudos))
-        
+        if pseudos :
+            for pseudo in pseudos:
+                self.listbox.insert(tk.END, f"{pseudo} connecté")
+                self.counter.set(len(pseudos))
+        else:
+            self.counter.set(0)
 
 
 if __name__ == "__main__":
