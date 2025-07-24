@@ -19,23 +19,15 @@ class GUI:
 
         right_frame = tk.Frame(main_frame)
         right_frame.pack(side=tk.RIGHT, fill=tk.Y)
-        
         self.message = "Bienvenue dans Sock.Nox !\nVeuillez saisir votre pseudo :"
         self.pseudo = "null"
-        self.label = tk.Label(left_frame, text=self.message)
+        self.label = tk.Label(master, text=self.message)
         self.label.pack(pady=40)
-        self.button = tk.Button(left_frame, text="Envoyer", command=self.send_pseudo)
+        self.button = tk.Button(master, text="Envoyer", command=self.send_pseudo)
         self.button.pack(pady=10)
-        self.to_btn = tk.Button(right_frame,text="Message privé",command=self.to)
-        self.to_btn.pack()
-        self.listbox = tk.Listbox(right_frame, bg="#1e1e2f", fg="#ffffff", font=("Segoe UI", 10))
-        self.listbox.pack()
-        self.entry = tk.Entry(left_frame)
+        self.entry = tk.Entry(master)
         self.entry.pack(pady=10)
         self.entry.focus()
-
-    def to(self):
-        messagebox.showwarning("pas fini","Veuillez attendre l'update")
 
     def send_pseudo(self):
         self.pseudo = self.entry.get()
@@ -45,7 +37,6 @@ class GUI:
         self.cl = client(self.pseudo)
         time.sleep(0.9)
         self.message = f"Bienvenue {self.pseudo} !\nVous pouvez maintenant commencer à discuter."
-        self.master.geometry("500x200")
         self.label.config(text=self.message)
         self.entry.delete(0, tk.END)
         self.button.config(text="Envoyer Message", command=self.send)
@@ -53,20 +44,12 @@ class GUI:
         self.entry.focus()
         thread_recv = threading.Thread(target=self.recevoir, daemon=True)
         thread_recv.start()
-
     def debug(self):
         while True:
             print(self.entry.get())    
-
     def update_message(self, new_message):
         self.message = new_message
         self.label.config(text=self.message)
-
-    def update_connection_list(self,pseudos):
-        self.listbox.delete(0, tk.END)
-        if pseudos :
-            for pseudo in pseudos:
-                self.listbox.insert(tk.END, f"{pseudo} connecté")
     def recevoir(self):
         while True:
             try:
@@ -75,18 +58,13 @@ class GUI:
                     self.update_message("Déconnexion du serveur.")
                     print("Déconnexion du serveur.")
                     break
-                if data.decode('utf-8').startswith("#"):
-                    ps=data.decode('utf-8')[1:]
-                    print(f"pseudo updated {ps}")
-                    self.update_connection_list(ps)
-                else:
-                    self.update_message(f"\n[Serveur] : {data.decode('utf-8')}")
+                self.update_message(f"\n[Serveur] : {data.decode('utf-8')}")
+                print("Entrez votre message (ou '/help' pour les commandes) : ",end="" ,flush=True)
             except Exception as e:
                 print(f"\nErreur lors de la réception : {e}")
                 break
     def send(self):
         mesage = self.entry.get()
-        self.entry.delete(0,tk.END)
         self.cl.send_message(mesage)
     
          

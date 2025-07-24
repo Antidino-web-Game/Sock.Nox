@@ -143,6 +143,7 @@ class GUI:
                 self.counter.set(len(pseudos))
         else:
             self.counter.set(0)
+        self.serveur.notify_users(f"#{self.users.get_all_pseudos()}")
 
 
 if __name__ == "__main__":
