@@ -11,6 +11,14 @@ class GUI:
         self.master.title("Sock.Nox client")
         self.master.resizable(False, False)
         self.master.geometry("300x200")
+        main_frame = tk.Frame(master)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        left_frame = tk.Frame(main_frame)
+        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        right_frame = tk.Frame(main_frame)
+        right_frame.pack(side=tk.RIGHT, fill=tk.Y)
         self.message = "Bienvenue dans Sock.Nox !\nVeuillez saisir votre pseudo :"
         self.pseudo = "null"
         self.label = tk.Label(master, text=self.message)
@@ -27,7 +35,7 @@ class GUI:
             messagebox.showerror("Erreur", "Veuillez entrer un pseudo.")
             return
         self.cl = client(self.pseudo)
-        time.sleep(1.4)
+        time.sleep(0.9)
         self.message = f"Bienvenue {self.pseudo} !\nVous pouvez maintenant commencer à discuter."
         self.label.config(text=self.message)
         self.entry.delete(0, tk.END)

@@ -2,12 +2,17 @@ import socket
 import threading
 from users import Users
 import tkinter as tk
+import ssl
+import os
 
 users = Users()
 
 class Srv:
     def __init__(self):
         self.gui = ""
+        self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        self.context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
+
 
     def send_message(self, client_socket, message):
         try:
@@ -89,7 +94,8 @@ class Srv:
         print(f"Serveur en écoute sur {host}:{port}...")
         try:
             while True:
-                client_socket, addr = srv_socket.accept()
+                secure_socket = self.context.wrap_socket(srv_socket, server_side=True)
+                client_socket, addr = secure_socket.accept()
                 thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
                 thread.start()
         except KeyboardInterrupt:
