@@ -28,7 +28,6 @@ class client:
         #self.cl = self.context.wrap_socket(raw_socket,server_hostname='127.0.0.1')
         #self.cl = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.cl.connect(('127.0.0.1', 12345))
-        self.cl.sendall(pseudo.encode("utf-8"))
         self.commandes = {
             '/pseudo': "liste les pseudos",
             '/exit': "quitte le chat",

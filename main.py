@@ -94,8 +94,8 @@ class Srv:
         print(f"Serveur en écoute sur {host}:{port}...")
         try:
             while True:
-                secure_socket = self.context.wrap_socket(srv_socket, server_side=True)
-                client_socket, addr = secure_socket.accept()
+                raw_client_socket, addr = srv_socket.accept()
+                client_socket = self.context.wrap_socket(raw_client_socket, server_side=True)
                 thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
                 thread.start()
         except KeyboardInterrupt:
