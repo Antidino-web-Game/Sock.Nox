@@ -58,10 +58,8 @@ class GUI:
         self.entry.focus()
         thread_recv = threading.Thread(target=self.recevoir, daemon=True)
         thread_recv.start()
-    import ast
 
     def nettoyer_liste(self,chaine):
-
         return str(chaine).replace("connecté", "").strip()
 
     def debug(self):
@@ -69,7 +67,8 @@ class GUI:
             print(self.entry.get())    
     def private_message(self,e):
         liste = self.listbox.get('active')
-        desitataire = self.nettoyer_liste(list)
+        print(liste)
+        desitataire = self.nettoyer_liste(liste)
         messagebox.showinfo("message privé",f"vous parler maintenant à {desitataire}")
     def update_message(self, new_message):
         self.message = new_message

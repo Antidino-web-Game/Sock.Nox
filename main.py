@@ -60,7 +60,6 @@ class Srv:
                         print(f"Message privé vers {target_pseudo} : {msg_private}")
                         self.send_private_message(target_pseudo, msg_private, exclude_pseudo=pseudo)
                     continue
-
                 print(f"Reçu de {pseudo}({addr}): {message}")
                 self.notify_users(f"[{pseudo}] : {message}", exclude_pseudo=pseudo)
         
