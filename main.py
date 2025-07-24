@@ -1,9 +1,11 @@
 import socket
+import winsound
 import threading
 from users import Users
 import tkinter as tk
 import ssl
 import os
+import time as t
 
 users = Users()
 
@@ -130,8 +132,12 @@ class GUI:
         self.button.pack(pady=10)
         self.listbox = tk.Listbox(right_frame, bg="#1e1e2f", fg="#ffffff", font=("Segoe UI", 10))
         self.listbox.pack(pady=5, fill=tk.BOTH, expand=True)
+        self.listbox.insert(tk.END,"Aucun utilisateur \nconnecté")
+        
 
     def start(self):
+        winsound.MessageBeep()
+        t.sleep(0.2)
         self.label.config(text="le serveur a démaré\nSur écoute...")
         threading.Thread(target=self.serveur.start, daemon=True).start()
     def update_connection_list(self):
@@ -143,7 +149,8 @@ class GUI:
                 self.counter.set(len(pseudos))
         else:
             self.counter.set(0)
-        self.serveur.notify_users(f"#{self.users.get_all_pseudos()}")
+            self.listbox.insert(tk.END,"Aucun utilisateur \nonnecté")
+        self.serveur.notify_users(str(self.users.get_all_pseudos()))
 
 
 if __name__ == "__main__":

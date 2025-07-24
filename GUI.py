@@ -1,9 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
 from client_connection import client
+import winsound
 import threading
 import time
 from PIL import Image, ImageTk
+import ast
 import socket
 class GUI:
     def __init__(self, master):
@@ -33,9 +35,11 @@ class GUI:
         self.entry = tk.Entry(left_frame)
         self.entry.pack(pady=10)
         self.entry.focus()
+        self.listbox.insert(tk.END,"Aucun utilisateur \nconnecté")
+        self.listbox.bind('<<ListboxSelect>>',self.private_message)
 
     def to(self):
-        messagebox.showwarning("pas fini","Veuillez attendre l'update")
+        messagebox.showwarning("Attention","Veuillez selectionnez un destinataire")
 
     def send_pseudo(self):
         self.pseudo = self.entry.get()
@@ -44,6 +48,7 @@ class GUI:
             return
         self.cl = client(self.pseudo)
         time.sleep(0.9)
+        winsound.MessageBeep()
         self.message = f"Bienvenue {self.pseudo} !\nVous pouvez maintenant commencer à discuter."
         self.master.geometry("500x200")
         self.label.config(text=self.message)
@@ -53,11 +58,19 @@ class GUI:
         self.entry.focus()
         thread_recv = threading.Thread(target=self.recevoir, daemon=True)
         thread_recv.start()
+    import ast
+
+    def nettoyer_liste(self,chaine):
+
+        return str(chaine).replace("connecté", "").strip()
 
     def debug(self):
         while True:
             print(self.entry.get())    
-
+    def private_message(self,e):
+        liste = self.listbox.get('active')
+        desitataire = self.nettoyer_liste(list)
+        messagebox.showinfo("message privé",f"vous parler maintenant à {desitataire}")
     def update_message(self, new_message):
         self.message = new_message
         self.label.config(text=self.message)
@@ -67,6 +80,8 @@ class GUI:
         if pseudos :
             for pseudo in pseudos:
                 self.listbox.insert(tk.END, f"{pseudo} connecté")
+        else:
+            self.listbox.insert(tk.END,"Aucun utilisateur \nconnecté")
     def recevoir(self):
         while True:
             try:
@@ -75,11 +90,13 @@ class GUI:
                     self.update_message("Déconnexion du serveur.")
                     print("Déconnexion du serveur.")
                     break
-                if data.decode('utf-8').startswith("#"):
-                    ps=data.decode('utf-8')[1:]
-                    print(f"pseudo updated {ps}")
-                    self.update_connection_list(ps)
-                else:
+                data = data.decode("utf-8")
+                try :
+                    liste = ast.literal_eval(data)
+                    liste.remove(self.pseudo)
+                    print(f"pseudo updated {liste}")
+                    self.update_connection_list(liste)
+                except Exception as E:
                     self.update_message(f"\n[Serveur] : {data.decode('utf-8')}")
             except Exception as e:
                 print(f"\nErreur lors de la réception : {e}")
